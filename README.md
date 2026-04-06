@@ -44,14 +44,15 @@ We are employing a **Hybrid Agentic Workflow**, utilizing robust gradient-boosti
 ## 📂 Repository Structure
 
 ```text
-polka/
+main
 │
-├── data/                   # Raw and processed datasets (CSV, Excel)
-├── notebooks/              # Jupyter notebooks for EDA and model prototyping
-├── src/                    # Source code for the project
-│   ├── data_cleaning.py    # Scripts for handling formatting and missing values
-│   ├── features.py         # Encoding and feature engineering pipelines
-│   └── model.py            # Training and evaluation logic
-├── docs/                   # Documentation (e.g., POLKA_environmental_classx)
-├── requirements.txt        # Python dependencies
-└── README.md               # Project overview
+├── data/
+│   └── environmental_data - Arkusz1.csv   # Twój zbiór danych
+│
+├── agents/
+│   ├── __init__.py
+│   └── data_analyst.py                    # Tu będzie kod naszego agenta
+│
+├── .env                                   # Tu bezpiecznie trzymamy klucze API
+├── main.py                                # Główny plik uruchomieniowy
+└── requirements.txt                       # Zależności projektu

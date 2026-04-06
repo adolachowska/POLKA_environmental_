@@ -57,7 +57,7 @@ def train_xgboost_model(X_train, y_train):
 
 if __name__ == "__main__":
 
-    data_path = 'environmental_data.csv'
+    data_path = 'data/environmental_data.csv'
     df_clean = load_and_clean_data(data_path)
 
     target_variable = 'system_type'
@@ -73,6 +73,11 @@ if __name__ == "__main__":
     y_pred = xgb_model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
 
+    false_country = X_test[y_test != y_pred]
+
+    false_country
+
     print(f"\nModel Accuracy: {accuracy:.2%}")
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
+    print(f"Countries falsely predicted{false_country['country_name'].tolist()}")
