@@ -51,8 +51,8 @@ main
 │
 ├── agents/
 │   ├── __init__.py
-│   └── data_analyst.py                    # Tu będzie kod naszego agenta
+│   └── data_analyst.py                    
 │
-├── .env                                   # Tu bezpiecznie trzymamy klucze API
-├── main.py                                # Główny plik uruchomieniowy
-└── requirements.txt                       # Zależności projektu
+├── .env                                   
+├── main.py                                
+└── requirements.txt                       
