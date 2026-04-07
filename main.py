@@ -57,8 +57,9 @@ def train_xgboost_model(X_train, y_train):
 
 if __name__ == "__main__":
 
-    data_path = 'data/environmental_data.csv'
-    df_clean = load_and_clean_data(data_path)
+    file_path = 'data/environmental_data.csv'
+    df_data = pd.read_csv(file_path)
+    df_clean = load_and_clean_data(file_path)
 
     target_variable = 'system_type'
     X, y, label_encoder = prepare_features_and_target(df_clean, target_variable)
@@ -73,11 +74,19 @@ if __name__ == "__main__":
     y_pred = xgb_model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
 
-    false_country = X_test[y_test != y_pred]
+    errors = (np.array(y_test) != np.array(y_pred))
+    bad_indices = X_test[errors].index
+    false_data = df_data.loc[bad_indices, ['country_name', 'year']].copy()
+    false_data['actual'] = np.array(y_test)[errors]
+    false_data['predicted'] = np.array(y_pred)[errors]
 
-    false_country
+    print(f"\nThe number of wrong prediction: {len(false_data)}")
+    print("Countries wrongly predicted:")
+    print("-" * 50)
+    for _, row in false_data.iterrows():
+        print(f"[{row['year']}] {row['country_name']} | "
+              f"True: {row['actual']} -> False: {row['predicted']}")
 
     print(f"\nModel Accuracy: {accuracy:.2%}")
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
-    print(f"Countries falsely predicted{false_country['country_name'].tolist()}")
