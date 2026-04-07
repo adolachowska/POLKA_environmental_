@@ -4,7 +4,7 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
-import config
+from agent_data_analyst import create_polka_analyst_agent
 
 def load_and_clean_data(file_path: str) -> pd.DataFrame:
 
@@ -55,8 +55,38 @@ def train_xgboost_model(X_train, y_train):
     return model
 
 
+os.environ["OPENAI_API_KEY"] = "PASTE_YOUR_API_KEY_HERE_OR_USE_DOTENV"
+
+
+def main():
+    print("--- STARTING POLKA SYSTEM ---")
+
+    # 2. Define the path to the data (remember about the relative path!)
+    data_path = 'data/environmental_data - Arkusz1.csv'
+
+    # ... You can paste your existing error analysis code (y_test, y_pred, etc.) here ...
+
+    # 3. CREATE THE AGENT using the imported function
+    print("\nInitializing AI Agent...")
+    polka_agent = create_polka_analyst_agent(data_path)
+
+    # 4. TALKING WITH THE DATA
+    query = (
+        "Analyze the dataset. What are the three most frequent "
+        "soil types (dominant_soil) for countries where 'system_type' is 'Democratic'?"
+    )
+
+    print(f"\nQuery to POLKA-Agent: {query}")
+    try:
+        # The invoke() method runs the agent (older LangChain versions used run())
+        response = polka_agent.invoke({"input": query})
+        print(f"\nResponse:\n{response['output']}")
+    except Exception as e:
+        print(f"Error during Agent execution: {e}")
+
 if __name__ == "__main__":
 
+    main()
     file_path = 'data/environmental_data.csv'
     df_data = pd.read_csv(file_path)
     df_clean = load_and_clean_data(file_path)
