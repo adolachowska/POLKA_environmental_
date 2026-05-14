@@ -38,6 +38,7 @@ We are employing a **Hybrid Agentic Workflow**, utilizing robust gradient-boosti
 * **Machine Learning:** Scikit-Learn, XGBoost / LightGBM
 * **Visualization:** Matplotlib, Seaborn, Plotly
 * **Future Deployment:** Streamlit / FastAPI, LangChain, PostgreSQL (pgvector)
+* **Docker**
 
 ---
 
