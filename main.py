@@ -24,7 +24,7 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
 
 
 def prepare_features_and_target(df: pd.DataFrame, target_col: str):
-    main_cols = ['sub_system_type', 'economic_type', 'if_rich']
+    main_cols = ['system_type', 'economic_type', 'if_rich']
 
     X = df.drop(columns=[target_col] + main_cols, errors='ignore')
     y = df[target_col]
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     df_clean = load_and_clean_data(file_path)
 
-    target_variable = 'system_type'
+    target_variable = 'sub_system_type'
     X, y, label_encoder, cat_features = prepare_features_and_target(df_clean, target_variable)
 
     X_train, X_test, y_train, y_test = train_test_split(
