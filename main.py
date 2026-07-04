@@ -23,11 +23,16 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
     return df
 
 
-def prepare_features_and_target(df: pd.DataFrame, target_col: str):
-    main_cols = ['system_type', 'economic_type', 'if_rich']
+def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_features: list = None):
+    main_cols = ['sub_system_type', 'economic_type', 'if_rich']
 
     X = df.drop(columns=[target_col] + main_cols, errors='ignore')
     y = df[target_col]
+
+    if selected_features is not None:
+        # Wybieramy tylko te kolumny, które istnieją i są na Twojej liście
+        valid_features = [col for col in selected_features if col in X.columns]
+        X = X[valid_features]
 
     categorical_cols = X.select_dtypes(include=['object', 'string', 'category']).columns.tolist()
 
@@ -69,7 +74,25 @@ if __name__ == "__main__":
     df_clean = load_and_clean_data(file_path)
 
     target_variable = 'sub_system_type'
-    X, y, label_encoder, cat_features = prepare_features_and_target(df_clean, target_variable)
+
+    analized_feauures = [
+        'soil_ratio',
+        'landscape_ratio',
+        'natural_forestation_ratio',
+        # 'border_ratio',
+        # 'max_degree_north',
+        # 'max_degree_south',
+        'dominant_landscape',
+        'dominant_climate'
+    ]
+
+    X, y, label_encoder, cat_features = prepare_features_and_target(
+        df_clean,
+        target_variable,
+        selected_features=analized_feauures
+    )
+
+    #X, y, label_encoder, cat_features = prepare_features_and_target(df_clean, target_variable)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
@@ -78,16 +101,13 @@ if __name__ == "__main__":
     print("\nTraining CatBoost...")
     cat_model = train_catboost_model(X_train, y_train, cat_features)
 
-    # Ewaluacja
     y_pred = cat_model.predict(X_test)
     y_pred = y_pred.flatten()
 
     accuracy = accuracy_score(y_test, y_pred)
 
-
     errors = (np.array(y_test) != y_pred)
     bad_indices = X_test[errors].index
-
 
     false_data = df_data.loc[bad_indices, ['country_name', 'year']].copy()
 
