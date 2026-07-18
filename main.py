@@ -16,12 +16,12 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
         'max_degree_north', 'max_degree_south', 'border_ratio'
     ]
 
+
     for col in comma_cols:
         if col in df.columns and df[col].dtype == 'object':
             df[col] = df[col].str.replace(',', '.').astype(float)
 
     return df
-
 
 def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_features: list = None):
     main_cols = ['sub_system_type', 'economic_type', 'if_rich']
@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     df_clean = load_and_clean_data(file_path)
 
-    target_variable = 'sub_system_type'
+    target_variable = 'if_rich'
 
     analized_feauures = [
         'soil_ratio',
