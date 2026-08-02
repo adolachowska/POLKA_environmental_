@@ -75,6 +75,7 @@ if __name__ == "__main__":
 
     target_variable = 'if_rich'
 
+
     analized_feauures = [
         'soil_ratio',
         'landscape_ratio',
