@@ -90,7 +90,7 @@ if __name__ == "__main__":
     X, y, label_encoder, cat_features = prepare_features_and_target(
         df_clean,
         target_variable,
-        selected_features=analized_feauures
+        selected_features=analized_features
     )
 
     #X, y, label_encoder, cat_features = prepare_features_and_target(df_clean, target_variable)
