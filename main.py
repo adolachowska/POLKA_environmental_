@@ -73,10 +73,10 @@ if __name__ == "__main__":
 
     df_clean = load_and_clean_data(file_path)
 
-    target_variable = 'if_rich'
+    target_variable = 'system_type'
 
 
-    analized_feauures = [
+    analized_features = [
         'soil_ratio',
         'landscape_ratio',
         'natural_forestation_ratio',
