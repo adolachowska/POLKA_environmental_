@@ -71,22 +71,29 @@ def save_feature_importance(model, feature_names, output_filename="feature_impor
     }).sort_values(by='Importance (%)', ascending=False)
 
     print("\n" + "=" * 50)
-    print("Feature Importance Ranking:")
+    print("RANKING OF GEOGRAPHICAL FEATURE IMPORTANCE:")
     print("=" * 50)
     for index, row in fi_df.iterrows():
         print(f"{row['Feature']:<30}: {row['Importance (%)']:.2f}%")
 
     plt.figure(figsize=(10, 6))
 
-    sns.barplot(x='Importance (%)', y='Feature', data=fi_df, palette='viridis', hue='Cecha', legend=False)
+    sns.barplot(
+        x='Importance (%)',
+        y='Feature',
+        data=fi_df,
+        palette='viridis',
+        hue='Feature',
+        legend=False
+    )
 
-    plt.title('The influence of natural features on the state structure (POLKA - CatBoost)', fontsize=14, pad=15)
+    plt.title('Impact of Geographical Features on Political System (POLKA - CatBoost)', fontsize=14, pad=15)
     plt.xlabel('Feature Importance (%)', fontsize=12)
-    plt.ylabel('Natural Feature', fontsize=12)
+    plt.ylabel('Environmental Features', fontsize=12)
     plt.tight_layout()
 
-    plt.savefig(output_filename, dpi=300)  # Wysoka rozdzielczość (300 dpi)
-    print(f"\n[Success] The chart has been saved as a file: {output_filename}")
+    plt.savefig(output_filename, dpi=300)
+    print(f"\n[SUCCESS] The chart has been saved as a file: {output_filename}")
 
 if __name__ == "__main__":
 
