@@ -4,6 +4,8 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def load_and_clean_data(file_path: str) -> pd.DataFrame:
@@ -60,6 +62,32 @@ def train_catboost_model(X_train, y_train, cat_features):
     return model
 
 
+def save_feature_importance(model, feature_names, output_filename="feature_importance.png"):
+    importances = model.get_feature_importance()
+
+    fi_df = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance (%)': importances
+    }).sort_values(by='Importance (%)', ascending=False)
+
+    print("\n" + "=" * 50)
+    print("Feature Importance Ranking:")
+    print("=" * 50)
+    for index, row in fi_df.iterrows():
+        print(f"{row['Feature']:<30}: {row['Importance (%)']:.2f}%")
+
+    plt.figure(figsize=(10, 6))
+
+    sns.barplot(x='Importance (%)', y='Feature', data=fi_df, palette='viridis', hue='Cecha', legend=False)
+
+    plt.title('The influence of natural features on the state structure (POLKA - CatBoost)', fontsize=14, pad=15)
+    plt.xlabel('Feature Importance (%)', fontsize=12)
+    plt.ylabel('Natural Feature', fontsize=12)
+    plt.tight_layout()
+
+    plt.savefig(output_filename, dpi=300)  # Wysoka rozdzielczość (300 dpi)
+    print(f"\n[Success] The chart has been saved as a file: {output_filename}")
+
 if __name__ == "__main__":
 
     file_path = 'data/environmental_data.csv'
@@ -101,6 +129,7 @@ if __name__ == "__main__":
 
     print("\nTraining CatBoost...")
     cat_model = train_catboost_model(X_train, y_train, cat_features)
+    save_feature_importance(cat_model, X.columns.tolist(), "feature_importance.png")
 
     y_pred = cat_model.predict(X_test)
     y_pred = y_pred.flatten()
