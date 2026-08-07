@@ -116,8 +116,8 @@ if __name__ == "__main__":
         'landscape_ratio',
         'natural_forestation_ratio',
         # 'border_ratio',
-        # 'max_degree_north',
-        # 'max_degree_south',
+        'max_degree_north',
+        'max_degree_south',
         'dominant_landscape',
         'dominant_climate'
     ]
