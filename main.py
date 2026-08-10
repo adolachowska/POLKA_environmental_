@@ -26,7 +26,7 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
     return df
 
 def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_features: list = None):
-    main_cols = ['sub_system_type', 'economic_type', 'if_rich']
+    main_cols = ['sub_system_type', 'economic_type', 'system_type']
 
     X = df.drop(columns=[target_col] + main_cols, errors='ignore')
     y = df[target_col]
@@ -70,6 +70,10 @@ def save_feature_importance(model, feature_names, output_filename="feature_impor
     }).sort_values(by='Importance (%)', ascending=False)
 
     print("\n" + "=" * 50)
+    print(f"\n TARGET VARIABLE: {target_variable}")
+    print("\n" + "=" * 50)
+
+    print("\n" + "=" * 50)
     print("RANKING OF GEOGRAPHICAL FEATURE IMPORTANCE:")
     print("=" * 50)
     for index, row in fi_df.iterrows():
@@ -107,18 +111,36 @@ if __name__ == "__main__":
 
     df_clean = load_and_clean_data(file_path)
 
-    target_variable = 'system_type'
+    target_variable = 'if_rich'
 
 
     analized_features = [
+        'land size',
+        'land_size_plus',
+        'continent_size',
+        'dominant_soil',
+        'ore_deposit',
+        'dominant_landscape',
+        'climate_dominant',
+        'climate_t2_dominant'
+        'climate_t2_dominant',
+        'max_degree_north',
+        'max_degree_south'
+        #borders:#
+        'count_boundaries',
+        'longest_border',
+        'country_borders',
+        'sea_borders',
+        'water_borders',
+        'desert_borders',
+        'mountain_borders',
+        'open_borders',
+        #ENGINEERED FEATURES:#
+        'continent_ratio',
         'soil_ratio',
         'landscape_ratio',
-        'natural_forestation_ratio',
-        # 'border_ratio',
-        'max_degree_north',
-        'max_degree_south',
-        'dominant_landscape',
-        'dominant_climate'
+        'border_ratio',
+        'natural_forestation_ratio'
     ]
 
     X, y, label_encoder, cat_features = prepare_features_and_target(
