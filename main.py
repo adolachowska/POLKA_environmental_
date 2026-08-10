@@ -32,7 +32,6 @@ def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_feat
     y = df[target_col]
 
     if selected_features is not None:
-        # Wybieramy tylko te kolumny, które istnieją i są na Twojej liście
         valid_features = [col for col in selected_features if col in X.columns]
         X = X[valid_features]
 
