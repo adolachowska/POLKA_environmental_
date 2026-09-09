@@ -115,10 +115,11 @@ if __name__ == "__main__":
 
 
     analized_features = [
-        'land size',
+        #'year_from',
+        'land_size',
         'land_size_plus',
         'continent_size',
-        #'capital_location'
+        #'capital_location',
         'dominant_soil',
         'ore_deposit',
         'dominant_landscape',
