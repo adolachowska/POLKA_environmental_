@@ -118,6 +118,7 @@ if __name__ == "__main__":
         'land size',
         'land_size_plus',
         'continent_size',
+        #'capital_location'
         'dominant_soil',
         'ore_deposit',
         'dominant_landscape',
