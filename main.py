@@ -100,7 +100,7 @@ def save_feature_importance(model, feature_names, output_filename="feature_impor
 
 if __name__ == "__main__":
 
-    file_path = 'data/environmental_data.csv'
+    file_path = 'data/environmental_data_2.0.csv'
 
     try:
         df_data = pd.read_csv(file_path)
@@ -115,11 +115,12 @@ if __name__ == "__main__":
 
 
     analized_features = [
-        #'year_from',#
-        #'land_size',#
-        #'land_size_plus',#
-        #'continent_size',#
-        #'capital_location',
+
+        'year_from',
+        #'land_size',
+        #'land_size_plus',
+        #'continent_size',
+        'capital_location',
         'dominant_soil',
         'ore_deposit',
         'dominant_landscape',
@@ -128,16 +129,16 @@ if __name__ == "__main__":
         'climate_t2_dominant',
         'max_degree_north',
         'max_degree_south'
-        #borders:#
+        #borders:
         'count_boundaries',
         'longest_border',
         'country_borders',
-        'sea_borders',
-        'water_borders',
-        'desert_borders',
-        'mountain_borders',
+        #'sea_borders',
+        #'water_borders',
+        #'desert_borders',
+        #'mountain_borders',
         'open_borders',
-        #ENGINEERED FEATURES:#
+        #ENGINEERED FEATURES:
         'continent_ratio',
         'soil_ratio',
         'landscape_ratio',
