@@ -46,6 +46,36 @@ def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_feat
     return X, y_encoded, le, categorical_cols
 
 
+def plot_feature_to_target_heatmap(df, feature_col, target_col, output_filename="feature_target_heatmap.png"):
+
+    print(f"\nAnalyzing relationship between '{feature_col}' and '{target_col}'...")
+
+    # Calculate the cross-tabulation (converting counts to percentages per row)
+    cross_tab = pd.crosstab(df[feature_col], df[target_col], normalize='index') * 100
+
+    # Generate the heatmap
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(
+        cross_tab,
+        annot=True,  # Show the exact percentages
+        fmt=".1f",  # Format to 1 decimal place
+        cmap="YlGnBu",  # Color scale (Yellow-Green-Blue)
+        cbar_kws={'label': 'Probability (%)'}
+    )
+
+    plt.title(f'How {feature_col} influences {target_col} (POLKA)', fontsize=14, pad=15)
+    plt.xlabel(f'Predicted System ({target_col})', fontsize=12)
+    plt.ylabel(f'Geographical Feature ({feature_col})', fontsize=12)
+
+    # Rotate the y-axis labels for better readability if text is long
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+
+    # Save the plot
+    plt.savefig(output_filename, dpi=300)
+    print(f"[SUCCESS] Heatmap saved as: {output_filename}")
+
+
 def train_catboost_model(X_train, y_train, cat_features):
     model = CatBoostClassifier(
         iterations=200,
@@ -112,6 +142,7 @@ if __name__ == "__main__":
     df_clean = load_and_clean_data(file_path)
 
     target_variable = 'if_rich'
+    feature_to_analyze = 'dominant_landscape'
 
 
     analized_features = [
@@ -146,6 +177,13 @@ if __name__ == "__main__":
         'natural_forestation_ratio'
     ]
 
+    plot_feature_to_target_heatmap(
+        df=df_clean,
+        feature_col=feature_to_analyze,
+        target_col=target_variable,
+        output_filename=f"heatmap_{feature_to_analyze}_vs_{target_variable}.png"
+    )
+
     X, y, label_encoder, cat_features = prepare_features_and_target(
         df_clean,
         target_variable,
@@ -153,7 +191,6 @@ if __name__ == "__main__":
     )
 
     #X, y, label_encoder, cat_features = prepare_features_and_target(df_clean, target_variable)
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
