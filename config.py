@@ -7,4 +7,4 @@ XGB_PARAMS = {
 }
 
 #docker run --rm -v "${PWD}:/app" polka-ml-env python main.py#
-#docker build -t polka-ml-env .#
+
