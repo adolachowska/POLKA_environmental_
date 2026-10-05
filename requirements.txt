@@ -7,6 +7,7 @@ seaborn>=0.12.0
 langchain
 langchain-experimental
 langchain-community
+langchain-ollama
 tabulate
 
 #docker build -t polka-ml-env .

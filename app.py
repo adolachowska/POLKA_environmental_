@@ -1,11 +1,15 @@
 import pandas as pd
 import sys
-from langchain_experimental.agents import create_pandas_dataframe_agent
-from langchain_community.chat_models import ChatOllama
+import warnings
+import requests
 
+#no warning
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+from langchain_experimental.agents import create_pandas_dataframe_agent
+from langchain_ollama import ChatOllama
 
 def run_polka_free_eda_agent(file_path: str):
-
     print("\n" + "=" * 50)
     print("POLKA SMART EDA AGENT (Free Local Model)")
     print("=" * 50)
@@ -16,22 +20,34 @@ def run_polka_free_eda_agent(file_path: str):
         print(f"[INFO] Dataset contains {df.shape[0]} rows and {df.shape[1]} columns.")
     except FileNotFoundError:
         print(f"[ERROR] File not found: {file_path}")
-        print("Ensure you mapped your volumes correctly in Docker using -v.")
         sys.exit(1)
 
+    # --- NOWY TEST POŁĄCZENIA ---
+    print("\n[DIAGNOSTYKA] Testowanie fizycznego połączenia Docker -> Windows...")
+    try:
+        # Próbujemy "zapukać" do Ollamy. Jeśli nie odpowie w 5 sekund, wyrzuci błąd.
+        test_response = requests.get("http://host.docker.internal:11434/api/tags", timeout=5)
+        test_response.raise_for_status()
+        print("[OK] Połączenie z Ollamą na Windowsie działa prawidłowo!")
+    except requests.exceptions.RequestException as e:
+        print(f"\n[KRYTYCZNY BŁĄD SIECI] Docker nie może połączyć się z Ollamą.")
+        print("Upewnij się, że ustawiłaś zmienną OLLAMA_HOST=0.0.0.0 w Windowsie i zrestartowałaś program Ollama.")
+        print(f"Szczegóły techniczne: {e}")
+        sys.exit(1)
+    # ----------------------------
 
     print("\nConnecting to the local Llama 3.1 model...")
     try:
         llm = ChatOllama(
             model="llama3.1",
             base_url="http://host.docker.internal:11434",
-            temperature=0 #->determinism
+            temperature=0
         )
 
         agent = create_pandas_dataframe_agent(
             llm,
             df,
-            verbose=False,
+            verbose=True,  # ZMIANA NA TRUE: Zobaczymy na zielono proces pisania kodu przez AI
             allow_dangerous_code=True,
             agent_type="zero-shot-react-description"
         )
@@ -40,12 +56,10 @@ def run_polka_free_eda_agent(file_path: str):
         sys.exit(1)
 
     print("\nAgent is ready! Ask your geographical and political questions.")
-    print("Example: 'Which countries have a Federal system_type and mountainous dominant_landscape?'")
-    print("Type 'exit', 'quit', or 'q' to close the assistant.\n")
 
-    # Interactive chat loop
     while True:
         try:
+            # Mała uwaga techniczna: w terminalu nie musisz wpisywać apostrofów (' ') wokół pytania
             user_question = input("POLKA> ")
         except (KeyboardInterrupt, EOFError):
             print("\nClosing EDA Agent. Goodbye!")
@@ -59,6 +73,8 @@ def run_polka_free_eda_agent(file_path: str):
             continue
 
         try:
+            print(
+                "[INFO] Wysyłanie zapytania do modelu... (proszę czekać, obliczenia na procesorze mogą chwilę potrwać)")
             response = agent.invoke(user_question)
             print(f"\n[Agent]: {response['output']}\n")
         except Exception as e:
@@ -66,7 +82,6 @@ def run_polka_free_eda_agent(file_path: str):
 
 
 if __name__ == "__main__":
-    # path inside the Docker container
     target_file_path = 'data/environmental_data.csv'
     run_polka_free_eda_agent(target_file_path)
 
