@@ -41,19 +41,3 @@ We are employing a **Hybrid Agentic Workflow**, utilizing robust gradient-boosti
 * **Docker**
 
 ---
-
-## 📂 Repository Structure
-
-```text
-main
-│
-├── data/
-│   └── environmental_data - Arkusz1.csv   # Twój zbiór danych
-│
-├── agents/
-│   ├── __init__.py
-│   └── data_analyst.py                    
-│
-├── .env                                   
-├── main.py                                
-└── requirements.txt                       
