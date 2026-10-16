@@ -23,16 +23,16 @@ def run_polka_free_eda_agent(file_path: str):
         sys.exit(1)
 
     # --- NOWY TEST POŁĄCZENIA ---
-    print("\n[DIAGNOSTYKA] Testowanie fizycznego połączenia Docker -> Windows...")
+    print("\n[DIAGNOSTICS] Testing the physical connection Docker -> Windows...")
     try:
-        # Próbujemy "zapukać" do Ollamy. Jeśli nie odpowie w 5 sekund, wyrzuci błąd.
+        # Attempt to reach Ollama. If it does not respond within 5 seconds, an error will be raised.
         test_response = requests.get("http://host.docker.internal:11434/api/tags", timeout=5)
         test_response.raise_for_status()
-        print("[OK] Połączenie z Ollamą na Windowsie działa prawidłowo!")
+        print("[OK] Connection to Ollama on Windows is working correctly!")
     except requests.exceptions.RequestException as e:
-        print(f"\n[KRYTYCZNY BŁĄD SIECI] Docker nie może połączyć się z Ollamą.")
-        print("Upewnij się, że ustawiłaś zmienną OLLAMA_HOST=0.0.0.0 w Windowsie i zrestartowałaś program Ollama.")
-        print(f"Szczegóły techniczne: {e}")
+        print(f"\n[CRITICAL NETWORK ERROR] Docker cannot connect to Ollama.")
+        print("Make sure you have set the OLLAMA_HOST=0.0.0.0 environment variable on Windows and restarted Ollama.")
+        print(f"Technical details: {e}")
         sys.exit(1)
     # ----------------------------
 
@@ -59,14 +59,10 @@ def run_polka_free_eda_agent(file_path: str):
 
     while True:
         try:
-            # Mała uwaga techniczna: w terminalu nie musisz wpisywać apostrofów (' ') wokół pytania
             user_question = input("POLKA> ")
         except (KeyboardInterrupt, EOFError):
             print("\nClosing EDA Agent. Goodbye!")
             break
-
-
-
 
         if user_question.lower() in ['exit', 'quit', 'q']:
             print("Closing EDA Agent. Goodbye!")
@@ -77,7 +73,6 @@ def run_polka_free_eda_agent(file_path: str):
 
         try:
             print(
-                "[INFO] Wysyłanie zapytania do modelu... (proszę czekać, obliczenia na procesorze mogą chwilę potrwać)")
             response = agent.invoke(user_question)
             print(f"\n[Agent]: {response['output']}\n")
         except Exception as e:
