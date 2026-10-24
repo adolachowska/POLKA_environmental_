@@ -26,7 +26,8 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
     return df
 
 def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_features: list = None):
-    main_cols = ['sub_system_type', 'economic_type', 'system_type']
+    #main_cols = ['if_rich', 'sub_system_type', 'system_type']
+    main_cols=['if_rich']
 
     X = df.drop(columns=[target_col] + main_cols, errors='ignore')
     y = df[target_col]
@@ -141,40 +142,40 @@ if __name__ == "__main__":
 
     df_clean = load_and_clean_data(file_path)
 
-    target_variable = 'if_rich'
+    target_variable = 'system_type'
     feature_to_analyze = 'dominant_landscape'
 
 
     analized_features = [
 
-        'year_from',
+        #'year_from',
         #'land_size',
         #'land_size_plus',
         #'continent_size',
-        'capital_location',
-        'dominant_soil',
-        'ore_deposit',
-        'dominant_landscape',
-        'climate_dominant',
-        'climate_t2_dominant'
-        'climate_t2_dominant',
-        'max_degree_north',
-        'max_degree_south'
+        #'capital_location',
+        #'dominant_soil',
+        #'ore_deposit',
+        #'dominant_landscape',
+        #'climate_dominant',
+        #'climate_t2_dominant'
+        #'climate_t2_dominant',
+        #'max_degree_north',
+        #'max_degree_south'
         #borders:
-        'count_boundaries',
-        'longest_border',
-        'country_borders',
+        #'count_boundaries',
+        #'longest_border',
+        #'country_borders',
         #'sea_borders',
         #'water_borders',
         #'desert_borders',
         #'mountain_borders',
-        'open_borders',
+        #'open_borders',
         #ENGINEERED FEATURES:
-        'continent_ratio',
-        'soil_ratio',
-        'landscape_ratio',
-        'border_ratio',
-        'natural_forestation_ratio'
+        #'continent_ratio',
+        #'soil_ratio',
+        #'landscape_ratio',
+        #'border_ratio',
+        #'natural_forestation_ratio'
     ]
 
     plot_feature_to_target_heatmap(
