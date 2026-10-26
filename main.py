@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from scipy.stats import chi2_contingency, kruskal
 
 def load_and_clean_data(file_path: str) -> pd.DataFrame:
     df = pd.read_csv(file_path)
@@ -14,16 +14,73 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
     df = df.drop(columns=drop_cols, errors='ignore')
 
     comma_cols = [
-        'soil_ratio', 'landscape_ratio', 'natural_forestation_ratio',
-        'max_degree_north', 'max_degree_south', 'border_ratio'
+        #'soil_ratio',
+        #'landscape_ratio',
+        #'natural_forestation_ratio',
+        #'max_degree_north',
+        #'max_degree_south',
+        #'border_ratio',
+        'continent_size'
     ]
-
 
     for col in comma_cols:
         if col in df.columns and df[col].dtype == 'object':
-            df[col] = df[col].str.replace(',', '.').astype(float)
+            df[col] = (df[col]
+                       .astype(str) #string
+                       .str.replace('\xa0', '', regex=False) #(\xa0)
+                       .str.replace(' ', '', regex=False) #(' ')
+                       .str.replace(',', '.', regex=False) #,->.
+                       .astype(float)) #float
 
     return df
+
+def filter_significant_features(df: pd.DataFrame, features: list, target_col: str, alpha: float = 0.05) -> list:
+    significant_features = []
+
+    df_valid = df.dropna(subset=[target_col]).copy()
+
+    for col in features:
+        if col not in df_valid.columns:
+            continue
+
+        p_value = 1.0
+        test_name = ""
+
+        if df_valid[col].dtype == 'object' or df_valid[col].dtype.name == 'category':
+            test_name = "Chi-Square"
+            contingency = pd.crosstab(df_valid[col], df_valid[target_col])
+            try:
+                chi2, p_value, dof, ex = chi2_contingency(contingency)
+            except ValueError:
+                p_value = 1.0
+
+
+        else:
+            test_name = "Kruskal-Wallis"
+            classes = df_valid[target_col].unique()
+            groups = [df_valid[df_valid[target_col] == c][col].dropna() for c in classes]
+            groups = [g for g in groups if len(g) > 0]
+
+            if len(groups) > 1:
+                try:
+                    stat, p_value = kruskal(*groups)
+                except ValueError:
+                    p_value = 1.0
+
+        status = "OK" if p_value < alpha else "CATEGORY WITH NO IMPACT"
+
+        if p_value < alpha:
+            significant_features.append(col)
+
+        print(f"{status:22} | {col:<25} | Test: {test_name:<14} | p-value: {p_value:.4f}")
+
+    print(
+        f" {len(significant_features)} from {len(features)} is significant")
+    for col in significant_features:
+        print(col)
+
+    return significant_features
+
 
 def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_features: list = None):
     #main_cols = ['if_rich', 'sub_system_type', 'system_type']
@@ -91,7 +148,6 @@ def train_catboost_model(X_train, y_train, cat_features):
     model.fit(X_train, y_train)
     return model
 
-
 def save_feature_importance(model, feature_names, output_filename="feature_importance.png"):
     importances = model.get_feature_importance()
 
@@ -131,7 +187,7 @@ def save_feature_importance(model, feature_names, output_filename="feature_impor
 
 if __name__ == "__main__":
 
-    file_path = 'data/environmental_data_2.0.csv'
+    file_path = 'data/environmental_data_3.2.csv'
 
     try:
         df_data = pd.read_csv(file_path)
@@ -143,15 +199,15 @@ if __name__ == "__main__":
     df_clean = load_and_clean_data(file_path)
 
     target_variable = 'system_type'
-    feature_to_analyze = 'dominant_landscape'
+    feature_to_analyze = 'continent_ratio'
 
 
     analized_features = [
 
         #'year_from',
-        #'land_size',
+        'land_size',
         #'land_size_plus',
-        #'continent_size',
+        'continent_size',
         #'capital_location',
         #'dominant_soil',
         #'ore_deposit',
@@ -171,7 +227,7 @@ if __name__ == "__main__":
         #'mountain_borders',
         #'open_borders',
         #ENGINEERED FEATURES:
-        #'continent_ratio',
+        'continent_ratio'
         #'soil_ratio',
         #'landscape_ratio',
         #'border_ratio',
@@ -185,10 +241,20 @@ if __name__ == "__main__":
         output_filename=f"heatmap_{feature_to_analyze}_vs_{target_variable}.png"
     )
 
+    statistically_valid_features = filter_significant_features(
+        df=df_clean,
+        features=analized_features,
+        target_col=target_variable,
+        alpha=0.05  #trust 0.05
+    )
+
+    if not statistically_valid_features:
+        statistically_valid_features = analized_features
+
     X, y, label_encoder, cat_features = prepare_features_and_target(
         df_clean,
         target_variable,
-        selected_features=analized_features
+        selected_features=statistically_valid_features
     )
 
     #X, y, label_encoder, cat_features = prepare_features_and_target(df_clean, target_variable)
