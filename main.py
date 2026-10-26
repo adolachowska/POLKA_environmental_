@@ -46,6 +46,8 @@ def filter_significant_features(df: pd.DataFrame, features: list, target_col: st
         p_value = 1.0
         test_name = ""
 
+
+
         if df_valid[col].dtype == 'object' or df_valid[col].dtype.name == 'category':
             test_name = "Chi-Square"
             contingency = pd.crosstab(df_valid[col], df_valid[target_col])
