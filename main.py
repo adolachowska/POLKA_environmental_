@@ -20,18 +20,19 @@ def load_and_clean_data(file_path: str) -> pd.DataFrame:
         #'max_degree_north',
         #'max_degree_south',
         #'border_ratio',
-        'continent_size'
+        'continent_size',
+        'land_size',
+        'continent_ratio'
     ]
 
     for col in comma_cols:
         if col in df.columns and df[col].dtype == 'object':
             df[col] = (df[col]
-                       .astype(str) #string
+                       .astype(str)
                        .str.replace('\xa0', '', regex=False) #(\xa0)
                        .str.replace(' ', '', regex=False) #(' ')
-                       .str.replace(',', '.', regex=False) #,->.
-                       .astype(float)) #float
-
+                       .str.replace(',', '.', regex=False)) #,->.
+            df[col] = pd.to_numeric(df[col], errors='coerce')
     return df
 
 def filter_significant_features(df: pd.DataFrame, features: list, target_col: str, alpha: float = 0.05) -> list:
@@ -45,7 +46,6 @@ def filter_significant_features(df: pd.DataFrame, features: list, target_col: st
 
         p_value = 1.0
         test_name = ""
-
 
 
         if df_valid[col].dtype == 'object' or df_valid[col].dtype.name == 'category':
@@ -105,8 +105,19 @@ def prepare_features_and_target(df: pd.DataFrame, target_col: str, selected_feat
 
     return X, y_encoded, le, categorical_cols
 
+#VISUAL AND DATA REPRESENTATION
 
-def plot_feature_to_target_heatmap(df, feature_col, target_col, output_filename="feature_target_heatmap.png"):
+def generate_text_distribution_report(df: pd.DataFrame, target_col: str, significant_features: list):
+
+    print("\n TEXT DISTRIBUTION REPORT (CATEGORICAL BREAKDOWN)")
+
+    if not significant_features:
+        print("No significant features available to generate the report.")
+        return
+
+
+
+"""def plot_feature_to_target_heatmap(df, feature_col, target_col, output_filename="feature_target_heatmap.png"):
 
     print(f"\nAnalyzing relationship between '{feature_col}' and '{target_col}'...")
 
@@ -133,7 +144,7 @@ def plot_feature_to_target_heatmap(df, feature_col, target_col, output_filename=
 
     # Save the plot
     plt.savefig(output_filename, dpi=300)
-    print(f"[SUCCESS] Heatmap saved as: {output_filename}")
+    print(f"[SUCCESS] Heatmap saved as: {output_filename}")"""
 
 
 def train_catboost_model(X_train, y_train, cat_features):
@@ -187,6 +198,8 @@ def save_feature_importance(model, feature_names, output_filename="feature_impor
     plt.savefig(output_filename, dpi=300)
     print(f"\n[SUCCESS] The chart has been saved as a file: {output_filename}")
 
+#MODEL
+
 if __name__ == "__main__":
 
     file_path = 'data/environmental_data_3.2.csv'
@@ -210,38 +223,24 @@ if __name__ == "__main__":
         'land_size',
         #'land_size_plus',
         'continent_size',
-        #'capital_location',
-        #'dominant_soil',
-        #'ore_deposit',
-        #'dominant_landscape',
-        #'climate_dominant',
-        #'climate_t2_dominant'
-        #'climate_t2_dominant',
-        #'max_degree_north',
-        #'max_degree_south'
+        'capital_location',
+        'capital_degree_NS',
+        'landforms',
+        'land_cover',
+        'climate_dominant',
+        'climate_t2_dominant',
         #borders:
-        #'count_boundaries',
-        #'longest_border',
-        #'country_borders',
-        #'sea_borders',
-        #'water_borders',
-        #'desert_borders',
-        #'mountain_borders',
-        #'open_borders',
         #ENGINEERED FEATURES:
         'continent_ratio'
-        #'soil_ratio',
-        #'landscape_ratio',
-        #'border_ratio',
-        #'natural_forestation_ratio'
+
     ]
 
-    plot_feature_to_target_heatmap(
+    """plot_feature_to_target_heatmap(
         df=df_clean,
         feature_col=feature_to_analyze,
         target_col=target_variable,
         output_filename=f"heatmap_{feature_to_analyze}_vs_{target_variable}.png"
-    )
+    )"""
 
     statistically_valid_features = filter_significant_features(
         df=df_clean,
@@ -252,6 +251,8 @@ if __name__ == "__main__":
 
     if not statistically_valid_features:
         statistically_valid_features = analized_features
+
+    # generate_text_distribution_report(df_clean, target_col, features)
 
     X, y, label_encoder, cat_features = prepare_features_and_target(
         df_clean,
